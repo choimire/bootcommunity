@@ -1,0 +1,30 @@
+server:
+    port: 8081
+
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/myboot
+        username: root
+        password: "0210"
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            maximum-pool-size: 10
+            minimum-idle: 5
+            idle-timeout: 3000
+            max-lifetime: 180000
+    jpa:
+        database-platform: org.hibernate.dialect.MySQLDialect
+        hibernate:
+            ddl-auto: update #개발중일 땐 update 웹서비스중일땐 none이나 validate
+        show-sql: true 
+        properties:
+            hibernate:
+                format_sql: true #sql코드가 보기좋게 나온당
+    thymeleaf:
+        cache: false #html 캐시를 끈다 (반영이 바로 되도록)
+
+    devtools:
+        restart:
+            enabled: true
+        livereload: 
+            enabled: true

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Mcommunity</title>
+</head>
+<body>
+    <!--header-->
+    <div th:replace="inc/header :: header"></div>
+    <!--body-->
+    <div class="container">
+        <table class="table table-hover py-4">
+            <colgroup>
+                <col width="5%">
+                <col>
+                <col width="10%">
+                <col width="10%">
+                <col width="15%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>조회수</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="lists :${lists}">
+                    <td th:text="${lists.id}"></td>
+                    <td><a th:href="@{/view(id=${lists.id})}" th:text="${lists.title}"></a></td>
+                    <td th:text="${lists.writer}"></td>
+                    <td th:text="${lists.hit}"></td>
+                    <!-- <td th:text="${lists.wdate}"></td> -->
+                    <td th:data-wdate="${lists.wdate}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="text-right mt-3 mb-5">
+            <a href="write" class="btn btn-dark">글쓰기</a>
+        </div>
+    </div>
+    <!--footer-->
+    <div th:replace="inc/footer :: footer"></div>
+<script>
+   document.querySelectorAll('td[data-wdate]').forEach(td => {
+            const wdate = new Date(td.dataset.wdate);
+            const now = new Date();
+            const diff = (now - wdate) / (1000 * 60 * 60); //시간 차이계산
+            let rdate;
+            if (diff < 24) {
+                rdate = wdate.getHours().toString().padStart(2, '0') + ":" +
+                    wdate.getMinutes().toString().padStart(2, '0');
+
+        }else{
+            rdate = wdate.getFullYear() + "-" + (wdate.getMonth() +1).toString().padStart(2,'0');
+            rdate += "-" + wdate.getDate().toString().padStart(2, "0");
+
+        }
+        td.textContent =rdate;
+    });
+</script>
+
+</body>
+</html>
