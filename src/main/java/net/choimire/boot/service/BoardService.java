@@ -18,6 +18,25 @@ public class BoardService {
         public List<Board> findAll(){
             return boardRepository.findAll();
         }
+
+        //검색
+        public List<Board> search(String key, String val){
+            switch (key) {
+                case "writer": 
+                    
+                   return boardRepository.findByWriterContaining(val);
+                case "title":
+
+                   return boardRepository.findByTitleContaining(val);
+                case "content":
+
+                   return boardRepository.findByContentContaining(val);
+
+                default:
+                  return boardRepository.findAll();
+            }
+        }
+
         //글 상세조회 optional t 값이 있을수도 없을수도있을때 명시적으로 쓰는 클래스
         public Optional<Board> findById(long id){
             return boardRepository.findById(id);

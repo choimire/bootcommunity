@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 
+
 @Controller
 public class BoardController {
         private final BoardService service;
@@ -34,8 +35,20 @@ public class BoardController {
         }
         //게시물 조회
         @GetMapping("/")
-        public String list(Model model) {
-            List<Board> lists = service.findAll();
+        public String list(
+            @RequestParam(value = "searchKey", required = false)String searchKey,
+            @RequestParam(value = "searchVal",required = false)String searchVal, 
+            
+            Model model) {
+            List<Board> lists;
+            if(searchKey != null && searchVal != null && !searchVal.isEmpty()){
+                lists = service.search(searchKey, searchVal);
+            }else{
+                lists= service.findAll();
+            }
+            model.addAttribute("lists", lists);
+            model.addAttribute("searchVal", searchVal);
+            model.addAttribute("searchKey", searchKey);
             // //시간을 24시간이후를 rdate로 보냄.  
             // List<Map<String,Object>> res= new ArrayList<>();
             //     for(Board bbs : lists){
@@ -62,23 +75,10 @@ public class BoardController {
         @GetMapping("/view")
         public String view(@ModelAttribute("id") long id, Model model) {
             Optional<Board> board = service.findById(id);
-                  /*
-       * Safelist safelist = Safelist.relaxed()
-       * .addTags("h1", "h2", "h3", "h4", "h5", "h6",
-       * "div", "span", "pre", "code", "ul", "li", "ol", "strong", "em")
-       * .addAttributes("div", "style", "class")
-       * .addAttributes("span", "style", "class")
-       * .addAttributes("pre", "style", "class")
-       * .addAttributes("code", "style", "class")
-       * .addAttributes("h1", "style", "class")
-       * .addAttributes("h2", "style", "class")
-       * .addAttributes("h3", "style", "class")
-       * .addAttributes("a", "href", "target", "rel", "class", "style")
-       * .addProtocols("a", "href", "http", "https", "mailto");
-*/
             if(board.isPresent()){
-                // board.ifPresent(bbs ->{
-                //     bbs.setContent(Jsoup.clean(bbs.getContent(), Safelist.relaxed()));
+                board.get().setHit(board.get().getHit() +1);
+                service.save(board.get());
+                
                 board.get().setContent(Jsoup.clean(board.get().getContent(), Safelist.relaxed()));
                 model.addAttribute("board", board.get());
                 return "view";
@@ -101,8 +101,46 @@ public class BoardController {
             
             return "redirect:/";
         }
+      //    글수정
+      @GetMapping("/edit")
+      public String editForm(@ModelAttribute("id") long id, Model model) {
+        Optional<Board> board = service.findById(id);
+                    
+        if(board.isPresent()){
+            // board.ifPresent(bbs ->{
+            //     bbs.setContent(Jsoup.clean(bbs.getContent(), Safelist.relaxed()));
+            board.get().setContent(Jsoup.clean(board.get().getContent(), Safelist.relaxed()));
+            model.addAttribute("board", board.get());
+            return "edit";
+        }else{
+            return "redirect/";
+        }
+      }
+
+      @PostMapping("/edit")
+      public String edit(@ModelAttribute Board board, Model model) {
+        Optional<Board> bbs=service.findById(board.getId());
+        if(bbs.isPresent()){
+            Board obbs= bbs.get();
+            if(obbs.getPass() !=null && obbs.getPass().equals(board.getPass())){
+                //나머지는 bbs의 값으로 하고 board로 받은 값(이름,제목,내용)만 업데이트
+                obbs.setWriter(board.getWriter());
+                obbs.setTitle(board.getTitle());
+                obbs.setContent(board.getContent());
+                service.save(board);
+                return "redirect:/view?id=" +board.getId();
+            }else{
+                model.addAttribute("error", "비밀번호가 일치하지않습니다.");
+                model.addAttribute("board", obbs);
+                return "edit";                
+            }
+
+        }
+        service.save(board);
+          
+          return "redirect/";
+      }
       
-        
     
         
         //글 삭제

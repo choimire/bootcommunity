@@ -39,6 +39,17 @@
                 </tr>
             </tbody>
         </table>
+        <div class="searchform">
+            <form action="/" class="searchform" method="get">
+                <select name="searchKey">
+                    <option value="writer" th:selected="${searchKey == 'writer'}">작성자</option>
+                    <option value="title" th:selected="${searchKey == 'title'}">제목</option>
+                    <option value="content" th:selected="${searchKey == 'content'}">내용</option>
+                </select>
+                <input type="search" name="keyword" placeholder="검색" th:value="${searchVal}">
+                <button type="submit">검색</button>
+            </form>
+        </div>
         <div class="text-right mt-3 mb-5">
             <a href="write" class="btn btn-dark">글쓰기</a>
         </div>

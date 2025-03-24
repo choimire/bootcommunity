@@ -38,7 +38,7 @@
  <div class="d-flex justify-content-end pt-20">
     <a href="/" class="btn">목록</a>
     <a href="write" class="btn ms-10">글쓰기</a>
-    <a href="@{/edit(id=${board.id})}" class="btn ms-10">수정</a>
+    <a th:href="@{/edit(id=${board.id})}" class="btn ms-10">수정</a>
     <a href="#" th:data-delid="${board.id}" class="del btn ms-10">삭제</a>
  </div> 
 
