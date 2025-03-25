@@ -53,7 +53,22 @@
         <div class="text-right mt-3 mb-5">
             <a href="write" class="btn btn-dark">글쓰기</a>
         </div>
-    </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!lists.hasPrevious()}? 'diabled'">
+                    <a th:href="@{/?page=${list.number-1}&size=${list.size}}" class="page-link">이전</a>
+                </li>
+                <th:block th:each="i:${#numbers.sequence(0,lists.totalPages - 1)}">
+                <li class="page-item" th:classappend="${i}==${lists.number}?'active'">
+                    <a th:href="@{/?[page=${i}&size=${list.size}]}" class="page-link" th:text="${i+1}">1</a>
+                </li>
+            </th:block>
+                <li class="page-item"th:classappend="${!lists.hasNext()}?'diabled'">
+                    <a th:href="@{/?page=${list.number+1}&size=${list.size}}" class="page-link" >다음</a>
+                </li>
+            </ul>
+        </nav>
+    </div><!--/.container-->
     <!--footer-->
     <div th:replace="inc/footer :: footer"></div>
 <script>

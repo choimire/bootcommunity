@@ -1,12 +1,16 @@
 package net.choimire.boot.controller;
 
 
-import java.util.List;
+
 import java.util.Map;
 import java.util.Optional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -36,15 +40,16 @@ public class BoardController {
         //게시물 조회
         @GetMapping("/")
         public String list(
+            @PageableDefault(size=10,sort="id", direction= Sort.Direction.DESC) Pageable pageable,
             @RequestParam(value = "searchKey", required = false)String searchKey,
             @RequestParam(value = "searchVal",required = false)String searchVal, 
             
             Model model) {
-            List<Board> lists;
+            Page<Board> lists;
             if(searchKey != null && searchVal != null && !searchVal.isEmpty()){
-                lists = service.search(searchKey, searchVal);
+                lists = service.search(searchKey, searchVal,pageable);
             }else{
-                lists= service.findAll();
+                lists= service.findAll(pageable);
             }
             model.addAttribute("lists", lists);
             model.addAttribute("searchVal", searchVal);

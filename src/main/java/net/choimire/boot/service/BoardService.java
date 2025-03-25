@@ -1,8 +1,10 @@
 package net.choimire.boot.service;
 
-import java.util.List;
+
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import net.choimire.boot.entity.Board;
@@ -15,25 +17,25 @@ public class BoardService {
             this.boardRepository = boardRepository;
         }
         //글 조회
-        public List<Board> findAll(){
-            return boardRepository.findAll();
+        public Page<Board> findAll(Pageable pageable){
+            return boardRepository.findAll(pageable);
         }
 
         //검색
-        public List<Board> search(String key, String val){
+        public Page<Board> search(String key, String val, Pageable pageable){
             switch (key) {
                 case "writer": 
                     
-                   return boardRepository.findByWriterContaining(val);
+                   return boardRepository.findByWriterContaining(val, pageable);
                 case "title":
 
-                   return boardRepository.findByTitleContaining(val);
+                   return boardRepository.findByTitleContaining(val, pageable);
                 case "content":
 
-                   return boardRepository.findByContentContaining(val);
+                   return boardRepository.findByContentContaining(val,pageable);
 
                 default:
-                  return boardRepository.findAll();
+                  return boardRepository.findAll(pageable);
             }
         }
 
