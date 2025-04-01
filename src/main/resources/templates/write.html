@@ -10,19 +10,63 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.9.1/summernote.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.9.1/lang/summernote-ko-KR.min.js"></script>
     <script>
-        $(function(){
+        $(function () {
             $("#content").summernote({
-                height:300,
-                lang:'ko-KR'
+                height: 300,
+                lang: 'ko-KR',
+                callbacks: {
+                    onImageUpload: function (files) {
+                        uploadFile(files[0], true);
+                    },
+                    onMediaDelete: function () { }
+                }
             });
         });
+
+        //파일을 업로드 한 후 에디터 창에 등록하는 함수
+        function uploadFile(file, insertIntoEditor) {
+            const fileKey = $("#fileKey").val();
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('fileKey', fileKey);
+        
+        //컨트롤러 요청
+        $.ajax({
+            url:"/upload",
+            type:"POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(data){
+               
+           
+                if(insertIntoEditor){
+                    if(data.ext == "jpg" || data.ext =="png" ||data.ext =="gif" ||data.ext =="webp"||data.ext =="gif"){
+                       
+                    $("#content").summernote("insertImage", data.fileUrl);
+                }else{
+                    $("#content").summernote("createLink",{
+                        text:data.nfileName,
+                        url:fileUrl,
+                        isNewWindow: true
+                    });
+                }
+            }
+            },
+            error: function(error){
+                alert("업로드실패");
+            }
+        })
+    }
+
     </script>
-    <title>Mcommunity</title>
+    <title>스프링부트 게시판</title>
 </head>
+
 <body>
-    <!--header-->
+    <!--헤더-->
     <div th:replace="inc/header :: header"></div>
-    <!--body-->
+    <!--본문-->
     <div class="container py-5">
         <form name="writeform" action="write" method="post" onsubmit="return validateForm();">
             <div class="row">
@@ -31,54 +75,56 @@
                 <label class="col-1 offset-1 mb-3">비밀번호</label>
                 <input type="password" name="pass" class="col-3 form-control mb-3" placeholder="비밀번호" />
                 <input type="hidden" name="userid" value="guest">
-                <div class="col-3 mb-3"></div>               
-                 <label class="col-1 mb-3">제목</label>
-                 <input type="text" name="title" class="form-control col-11 mb-3" placeholder="제목" />
-                 
-                 <label class="col-1 mb-3">내용</label>
-                 <div class="col-11 mb-3">
-                     <textarea name="content" id="content"></textarea>
-                 </div>
+                <div class="col-3 mb-3"></div>
+                <label class="col-1 mb-3">제목</label>
+                <input type="text" name="title" class="form-control col-11 mb-3" placeholder="제목" />
+
+                <label class="col-1 mb-3">내용</label>
+                <div class="col-11 mb-3">
+                    <textarea name="content" id="content"></textarea>
+                </div>
+                <input type="hidden" id="fileKey" th:value="${fileKey}"/>
             </div>
             <div class="text-center my-4">
+                <button class="btn btn-danger" type="reset">취소</button>
                 <button class="btn btn-dark" type="submit">전송</button>
-               <button class="btn btn-danger" type="reset">취소</button>
             </div>
-            </form>
+        </form>
         <script>
-            function validateForm(){
-               //제목, 내용
-               const title = document.writeform.title.value.trim();
-               const content = document.writeform.content.value.trim();         
-               const writer = document.writeform.writer.value.trim();
-               const pass = document.writeform.pass.value.trim();
-                   
-               if(writer === ""){
+            function validateForm() {
+                //제목, 내용
+                const title = document.writeform.title.value.trim();
+                const content = document.writeform.content.value.trim();
+                const writer = document.writeform.writer.value.trim();
+                const pass = document.writeform.pass.value.trim();
+
+                if (writer === "") {
                     alert("이름을 입력 하세요.");
                     document.writeform.writer.focus();
                     return false;
-               }
-               if(pass === ""){
+                }
+                if (pass === "") {
                     alert("비밀번호를 입력 하세요.");
-                    document.writeform.pass.focus();      
+                    document.writeform.pass.focus();
                     return false;
-               }                
-               if(title === ""){
-                   alert("제목을 입력하세요.");
-                   document.writeform.title.focus();
-                   return false;
-               }
-               if(content === ""){
-                   alert("내용을 입력하세요.");
-                   document.writeform.content.focus();
-                   return false;
-               }
-               
-               return true;
+                }
+                if (title === "") {
+                    alert("제목을 입력하세요.");
+                    document.writeform.title.focus();
+                    return false;
+                }
+                if (content === "") {
+                    alert("내용을 입력하세요.");
+                    document.writeform.content.focus();
+                    return false;
+                }
+
+                return true;
             }
-         </script>
+        </script>
     </div>
-     <!--footer-->
-     <div th:replace="inc/footer :: footer"></div>
+    <!--푸터-->
+    <div th:replace="inc/footer :: footer"></div>
 </body>
+
 </html>

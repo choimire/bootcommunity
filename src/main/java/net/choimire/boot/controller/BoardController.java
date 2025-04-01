@@ -96,7 +96,7 @@ public class BoardController {
         //글쓰기
         @GetMapping("/write")
         public String writeForm(Model model) {
-            model.addAttribute("ntime",System.currentTimeMillis());
+            model.addAttribute("fileKey",System.currentTimeMillis());
             return "write";
         }
         //글 등록
